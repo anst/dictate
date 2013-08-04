@@ -1,0 +1,104 @@
+<html>
+<head>
+	<title>Dictate.io - Speech to Text Online</title>
+	<link rel="stylesheet" type="text/css" href="styles/style.css">
+</head>
+<body>
+	<header>
+		<div class="logo" style="margin-right:10px;float:left;"></div>
+		<div style="line-height:85px;font-size: 14px;font-weight:lighter;white-space: nowrap;">
+		To start using Dictate press Speak. Press the question mark to find out about commands you can do with Dictate. Clicking the Facebook or Twitter buttons will share your text.
+		</div>
+	</header>
+	<textarea class="ckeditor" id="editor1" name="editor1"></textarea>
+	
+	<section class="main">
+
+		<div class="middle">
+			<div class="button full"><div class="mic"></div>Speak<input x-webkit-speech id="input"></div>
+		</div>
+		<div class="left">
+			<div class="button large" id="html" onclick="displayHTML();"><div class="download"></div><span>.HTML</span></div>
+			<div class="button large" id="txt" onclick="displayText();"><div class="download"></div><span>.TXT</span></div>			
+		</div>
+		<div class="right">
+			<a class="button small"><div class="about"></div></a>
+			<a class="button small"><div class="twitter"></div></a>
+			
+		</div>
+	</section>
+</body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script src="ckeditor/ckeditor.js"></script>
+
+<script type="text/javascript">
+function getClearText( strSrc ) {
+	return  strSrc.replace( /<[^<|>]+?>/gi,'' );
+}
+function displayText() {
+	displayWindow(getClearText(CKEDITOR.instances.editor1.getData()));
+}
+function displayHTML() {
+	displayWindow(CKEDITOR.instances.editor1.getData(),true);
+}
+function displayWindow(string) {
+	top.consoleRef=window.open('','Data',
+  'width=840,height=560'
+   +',menubar=0'
+   +',toolbar=1'
+   +',status=0'
+   +',scrollbars=1'
+   +',resizable=1')
+ top.consoleRef.document.writeln('<pre>'+string+'</pre>')
+ top.consoleRef.document.close()
+}
+function displayWindow(string, html) {
+	top.consoleRef=window.open('','Data',
+  'width=840,height=560'
+   +',menubar=0'
+   +',toolbar=1'
+   +',status=0'
+   +',scrollbars=1'
+   +',resizable=1')
+ top.consoleRef.document.writeln(string)
+ top.consoleRef.document.close()
+}
+CKEDITOR.replace( 'editor1', {
+	uiColor: '#60c958',
+});
+
+
+$(document).ready(function () {
+ 
+  if(document.createElement('input').webkitSpeech == undefined) {
+	CKEDITOR.instances.editor1.insertText("We are sorry but Dictate requires Google Chrome.");
+  }
+  else {
+    var language = window.navigator.userLanguage || window.navigator.language;
+    $("#input").attr("lang", language).focus();
+  }
+  
+  $("#input").bind(
+    "webkitspeechchange", function(e) {
+      var val = $(this).val();
+
+      if (val == "delete all") {
+        CKEDITOR.instances.editor1.setData(''); return;
+      }
+
+      if (val == "new line")
+        val = "<br>";
+      else {
+        val = val.substr(0,1).toUpperCase() + val.substr(1);
+        if (val.match(/[a-zA-Z]$/))
+          val = val + ".";
+      }
+      CKEDITOR.instances.editor1.insertText($("#editor1").val()+ " " + val + " ");
+      $(this).val("").focus();
+
+  }); 
+});
+
+</script>
+
+</html>
